@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Registration Page</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #f9f6f1;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        #reg {
+            background-color: #fff;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #000;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <fieldset id="reg">
+        <section id="register">
+            <h2>Register</h2>
+            <input type="text" id="name" placeholder="Enter name" required /> <br /><br />
+            <input type="text" id="userid" placeholder="Enter Username" required /> <br /><br />
+            <input type="password" id="password" placeholder="Enter Password" required /> <br /><br />
+            <input type="password" id="re_password" placeholder="Re-enter Password" required /><br /><br />
+            <input type="email" id="email" placeholder="Enter Email" required /> <br /><br />
+            <input type="file" id="image" accept="image/*" /><br /><br />
+            <button type="button" onclick="register()">Register</button>
+        </section>
+    </fieldset>
+
+    <script>
+        function register() {
+            let userid = document.getElementById("userid").value;
+            let password = document.getElementById("password").value;
+            let repassword = document.getElementById("re_password").value;
+            let email = document.getElementById("email").value;
+            let name = document.getElementById("name").value;
+            let imageInput = document.getElementById("image");
+
+            if (password === repassword) {
+                let users = JSON.parse(localStorage.getItem("users")) || [];
+
+                let userExists = users.some((user) => user.userid === userid);
+                if (userExists) {
+                    alert("User already exists. Please choose another username.");
+                } else {
+                    let reader = new FileReader();
+                    reader.onloadend = function() {
+                        let imageBase64 = reader.result; 
+                        users.push({ userid, password, email, name, image: imageBase64 });
+                        localStorage.setItem("users", JSON.stringify(users));
+
+                        // Set the logged-in user
+                        localStorage.setItem("loggedInUser", userid);
+
+                        alert("Registration successful.");
+                        window.location.href = "login.html"; 
+                    };
+
+                    if (imageInput.files.length > 0) {
+                        reader.readAsDataURL(imageInput.files[0]);
+                    } else {
+                        users.push({ userid, password, email, name, image: null });
+                        localStorage.setItem("users", JSON.stringify(users));
+                        localStorage.setItem("loggedInUser", userid);
+                        alert("Registration successful without image.");
+                        window.location.href = "login.html";
+                    }
+                }
+            } else {
+                alert("Passwords do not match.");
+            }
+        }
+    </script>
+</body>
+</html>
